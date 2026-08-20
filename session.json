@@ -1,0 +1,101 @@
+{
+  "cookies": [
+    {
+      "name": "ASP.NET_SessionId",
+      "value": "ixe4bmd4tbk33eo2vj2s45no",
+      "domain": "partners.hathway-connect.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ASP.NET_SessionId",
+      "value": "0i4hne3sv1id010qnpau200v",
+      "domain": "cg.hathway-connect.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "myCookie",
+      "value": "9b91df8fcdc4=iL3DPOwX80fuRTWOA2r2RuEUpsXz9tkkU/RTcJChr/bqDD6AbuzRFM4cbnwJRl/HBi736y3aI39OvpYeYcjLedIOjNTlASF0w7ctf6No0/jrDMn6KcEkNJm3uvnG34imrWC4xX7t1IJONyqi8S/4rYdrr9w45F8NuVxpBL2WLTo=",
+      "domain": "cg.hathway-connect.com",
+      "path": "/",
+      "expires": 1787209220.92203,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "AuthToken",
+      "value": "7w_gDQ#XlH92sOc",
+      "domain": "cg.hathway-connect.com",
+      "path": "/",
+      "expires": 1787208620.922094,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "storageState": {
+    "cookies": [
+      {
+        "name": "ASP.NET_SessionId",
+        "value": "ixe4bmd4tbk33eo2vj2s45no",
+        "domain": "partners.hathway-connect.com",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "ASP.NET_SessionId",
+        "value": "0i4hne3sv1id010qnpau200v",
+        "domain": "cg.hathway-connect.com",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "myCookie",
+        "value": "9b91df8fcdc4=iL3DPOwX80fuRTWOA2r2RuEUpsXz9tkkU/RTcJChr/bqDD6AbuzRFM4cbnwJRl/HBi736y3aI39OvpYeYcjLedIOjNTlASF0w7ctf6No0/jrDMn6KcEkNJm3uvnG34imrWC4xX7t1IJONyqi8S/4rYdrr9w45F8NuVxpBL2WLTo=",
+        "domain": "cg.hathway-connect.com",
+        "path": "/",
+        "expires": 1787209220.92203,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "AuthToken",
+        "value": "7w_gDQ#XlH92sOc",
+        "domain": "cg.hathway-connect.com",
+        "path": "/",
+        "expires": 1787208620.922094,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "Lax"
+      }
+    ],
+    "origins": [
+      {
+        "origin": "https://www.google.com",
+        "localStorage": [
+          {
+            "name": "rc::a",
+            "value": "b3V0NzA3cTN0MWx6"
+          }
+        ]
+      }
+    ]
+  },
+  "timestamp": "2026-08-20T06:30:31.163Z",
+  "baseUrl": "https://cg.hathway-connect.com"
+}
