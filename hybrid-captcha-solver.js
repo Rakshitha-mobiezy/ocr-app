@@ -9,7 +9,8 @@ class HybridCaptchaSolver {
         
         try {
             // Call Python script
-            const { stdout, stderr } = await execPromise(`python python_ocr_bridge.py "${imagePath}"`);
+            // const { stdout, stderr } = await execPromise(`python python_ocr_bridge.py "${imagePath}"`);
+            const { stdout, stderr } = await execPromise(`/var/www/myapp/venv/bin/python3 python_ocr_bridge.py "${imagePath}"`);
             
             if (stderr) {
                 console.log('Python stderr:', stderr);
