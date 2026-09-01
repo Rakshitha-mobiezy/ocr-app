@@ -15,7 +15,7 @@ class LoginAutomation {
     async initialize() {
         // Launch browser with necessary options
         this.browser = await chromium.launch({
-            headless: false, // Set to true for headless mode
+            headless: true, // Set to true for headless mode
             slowMo: 1000,    // Slow down actions for better visibility
         });
         

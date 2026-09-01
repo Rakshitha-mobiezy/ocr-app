@@ -7,7 +7,7 @@ module.exports = {
     
     // Automation settings
     maxRetries: 3,
-    headless: false, // Set to true to run without browser window
+    headless: true, // Set to true to run without browser window
     slowMo: 1000,    // Milliseconds to slow down actions
     
     // CAPTCHA settings  

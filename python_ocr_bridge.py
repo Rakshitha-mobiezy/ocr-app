@@ -6,7 +6,7 @@ import json
 from PIL import Image
 
 # Tesseract installation path
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def preprocess_and_ocr(image_path):
     try:
