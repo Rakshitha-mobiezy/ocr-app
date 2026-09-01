@@ -255,6 +255,44 @@ class LoginAutomation {
         }
     }
 
+    // Add this method to the LoginAutomation class
+    async performPackManagementTasks(vcNumber) {
+        console.log('\n📦 Starting Pack Management Tasks...');
+        
+        try {
+            // Import the PackManagementAutomation class
+            const PackManagementAutomation = require('./pack-management.js');
+            const packManager = new PackManagementAutomation(this.page);
+            
+            // Check if we're on the right page
+            const currentUrl = this.page.url();
+            if (!currentUrl.includes('frmAssignPlan.aspx')) {
+                console.log('⚠️ Not on Pack Management page. Trying to navigate...');
+                // Try to navigate to Pack Management
+                const navResult = await this.navigateToPackManagement();
+                if (!navResult) {
+                    console.log('❌ Could not navigate to Pack Management');
+                    return false;
+                }
+            }
+            
+            // Perform the renewal process
+            const result = await packManager.performFullRenewal(vcNumber);
+            
+            if (result) {
+                console.log('✅ Pack Management tasks completed successfully!');
+            } else {
+                console.log('❌ Pack Management tasks failed');
+            }
+            
+            return result;
+            
+        } catch (error) {
+            console.error('❌ Error in Pack Management:', error.message);
+            return false;
+        }
+    }
+
     async handleLoginProcess(username, password, maxRetries = 3) {
         let attempts = 0;
         

@@ -1,8 +1,9 @@
 // Configuration file for login automation
 module.exports = {
     // Login credentials (required)
-    username: 'ANUPAMAD4',
-    password: 'DmytR0Oy',
+    username: 'SC',
+    password: 'p1HapFw4',
+    vcNumber: 'T403221167147',
     
     // Automation settings
     maxRetries: 3,
