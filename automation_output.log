@@ -1,0 +1,81 @@
+[2026-09-02T09:42:16.422Z]
+🚀 Starting Login Automation with Python OCR
+==================================================
+👤 Username: ANUPAMAD4
+🔢 VC Number: T403221167147
+🔄 Max Retries: 3
+==================================================
+Initializing browser...
+
+--- Attempt 1 of 3 ---
+Navigating to login page...
+Filling login credentials...
+Filled username: ANUPAMAD4
+Filled password
+Starting 6-digit CAPTCHA solving with Python OCR...
+📸 CAPTCHA image saved for processing...
+🐍 Using Python OCR (proven working method)...
+🐍 Using Python OCR bridge...
+Refreshing CAPTCHA...
+Waiting before next attempt...
+
+--- Attempt 2 of 3 ---
+Navigating to login page...
+Filling login credentials...
+Filled username: ANUPAMAD4
+Filled password
+Starting 6-digit CAPTCHA solving with Python OCR...
+📸 CAPTCHA image saved for processing...
+🐍 Using Python OCR (proven working method)...
+🐍 Using Python OCR bridge...
+Refreshing CAPTCHA...
+Waiting before next attempt...
+
+--- Attempt 3 of 3 ---
+Navigating to login page...
+Filling login credentials...
+Filled username: ANUPAMAD4
+Filled password
+Starting 6-digit CAPTCHA solving with Python OCR...
+📸 CAPTCHA image saved for processing...
+🐍 Using Python OCR (proven working method)...
+🐍 Using Python OCR bridge...
+Refreshing CAPTCHA...
+❌ Failed to complete login after 3 attempts
+
+==================================================
+❌ LOGIN FAILED
+📊 Failed after 3 attempts
+==================================================
+Browser closed
+
+💥 Python bridge error: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+💥 CAPTCHA solving failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+Attempt 1 failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+💥 Python bridge error: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+💥 CAPTCHA solving failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+Attempt 2 failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+💥 Python bridge error: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+💥 CAPTCHA solving failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+Attempt 3 failed: CAPTCHA solving failed: Command failed: /var/www/myapp/venv/bin/python3 python_ocr_bridge.py "C:\Users\Admin\Downloads\hathway-automation\hathway-automation\captcha.png"
+The system cannot find the path specified.
+
+
+============================================================
+
