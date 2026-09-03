@@ -760,32 +760,26 @@ class PackManagementAutomation {
         }
     }
 
-        async clickConfirmPopup() {
+            async clickConfirmPopup() {
         console.log('✅ Clicking CONFIRM on first popup...');
 
         try {
-            // Wait for a modal/popup to appear
-            const modal = this.page.locator('.modal, [class*="modal"], .popup, [class*="popup"], [role="dialog"]').first();
-            await modal.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {
-                console.log('⚠️ No modal detected within timeout, will still try to locate Confirm button');
-            });
-
-            // Match a button/link/span with text "Confirm" (case-insensitive)
             const confirmButton = this.page
                 .locator('button, a, span, input[type="button"], input[type="submit"]')
                 .filter({ hasText: /^\s*confirm\s*$/i });
 
-            const count = await confirmButton.count();
-            if (count === 0) {
-                console.log('❌ Confirm button not found');
-                await this.page.screenshot({ path: 'confirm_not_found.png' });
-                return false;
-            }
-
-            await confirmButton.first().click({ force: true });
+            // Wait for it to actually become VISIBLE (not just present in DOM)
+            await confirmButton.first().waitFor({ state: 'visible', timeout: 10000 });
+            await confirmButton.first().click();
 
             console.log('✅ Confirm clicked');
-            await this.page.waitForTimeout(2000);
+
+            // This triggers an ASP.NET postback (WebForm_DoPostBackWithOptions) —
+            // wait for the page to settle before looking for the next popup
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(1500);
             await this.page.screenshot({ path: 'after_confirm_click.png' });
 
             return true;
@@ -801,26 +795,24 @@ class PackManagementAutomation {
         console.log('✅ Clicking OK on second popup...');
 
         try {
-            const modal = this.page.locator('.modal, [class*="modal"], .popup, [class*="popup"], [role="dialog"]').first();
-            await modal.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {
-                console.log('⚠️ No modal detected within timeout, will still try to locate OK button');
-            });
-
-            const okButton = this.page
-                .locator('button, a, span, input[type="button"], input[type="submit"]')
-                .filter({ hasText: /^\s*ok\s*$/i });
-
-            const count = await okButton.count();
-            if (count === 0) {
-                console.log('❌ OK button not found');
-                await this.page.screenshot({ path: 'ok_not_found.png' });
-                return false;
+            // Prefer the stable ID we saw in the logs; fall back to text match
+            let okButton = this.page.locator('#MasterBody_Button16');
+            if (await okButton.count() === 0) {
+                okButton = this.page
+                    .locator('button, a, span, input[type="button"], input[type="submit"]')
+                    .filter({ hasText: /^\s*ok\s*$/i });
             }
 
-            await okButton.first().click({ force: true });
+            // Wait for it to become VISIBLE, giving the postback time to render it
+            await okButton.first().waitFor({ state: 'visible', timeout: 10000 });
+            await okButton.first().click();
 
             console.log('✅ OK clicked');
-            await this.page.waitForTimeout(2000);
+
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(1500);
             await this.page.screenshot({ path: 'after_ok_click.png' });
 
             return true;
