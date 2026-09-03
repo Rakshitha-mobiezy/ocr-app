@@ -791,35 +791,43 @@ class PackManagementAutomation {
         }
     }
 
-    async clickOkPopup() {
-        console.log('✅ Clicking OK on second popup...');
+        async clickYesPopup() {
+        console.log('✅ Clicking YES on second popup...');
 
         try {
-            // Prefer the stable ID we saw in the logs; fall back to text match
-            let okButton = this.page.locator('#MasterBody_Button16');
-            if (await okButton.count() === 0) {
-                okButton = this.page
-                    .locator('button, a, span, input[type="button"], input[type="submit"]')
-                    .filter({ hasText: /^\s*ok\s*$/i });
-            }
+            // Wait for the SECOND confirmation modal specifically —
+            // it has distinct text "Are you sure you want to renew the plan"
+            // (no question mark, no "with following details"), so we can
+            // wait for that exact modal to appear rather than the first one.
+            const secondModalText = this.page.locator('text=/Are you sure you want to renew the plan/i');
+            await secondModalText.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {
+                console.log('⚠️ Distinct second-modal text not found, falling back to generic Yes search');
+            });
 
-            // Wait for it to become VISIBLE, giving the postback time to render it
-            await okButton.first().waitFor({ state: 'visible', timeout: 10000 });
-            await okButton.first().click();
+            const yesButton = this.page
+                .locator('button:visible, a:visible, span:visible, input[type="button"]:visible, input[type="submit"]:visible')
+                .filter({ hasText: /^\s*yes\s*$/i });
 
-            console.log('✅ OK clicked');
+            await yesButton.first().waitFor({ state: 'visible', timeout: 15000 });
+
+            const outerHtml = await yesButton.first().evaluate(el => el.outerHTML).catch(() => 'n/a');
+            console.log(`   Yes element resolved to: ${outerHtml}`);
+
+            await yesButton.first().click();
+
+            console.log('✅ Yes clicked');
 
             await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
                 console.log('⚠️ networkidle wait timed out, continuing anyway');
             });
             await this.page.waitForTimeout(1500);
-            await this.page.screenshot({ path: 'after_ok_click.png' });
+            await this.page.screenshot({ path: 'after_yes_click.png' });
 
             return true;
 
         } catch (error) {
-            console.error('❌ Error clicking OK:', error.message);
-            await this.page.screenshot({ path: 'ok_error.png' });
+            console.error('❌ Error clicking Yes:', error.message);
+            await this.page.screenshot({ path: 'yes_error.png' });
             return false;
         }
     }
@@ -872,9 +880,9 @@ class PackManagementAutomation {
                 return false;
             }
 
-            const okResult = await this.clickOkPopup();
-            if (!okResult) {
-                console.log('❌ Failed to click OK');
+            const okResult = await this.clickYesPopup();
+            if (!yesResult) {
+                console.log('❌ Failed to click yes');
                 return false;
             }
 
