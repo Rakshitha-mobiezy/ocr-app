@@ -760,6 +760,78 @@ class PackManagementAutomation {
         }
     }
 
+        async clickConfirmPopup() {
+        console.log('✅ Clicking CONFIRM on first popup...');
+
+        try {
+            // Wait for a modal/popup to appear
+            const modal = this.page.locator('.modal, [class*="modal"], .popup, [class*="popup"], [role="dialog"]').first();
+            await modal.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {
+                console.log('⚠️ No modal detected within timeout, will still try to locate Confirm button');
+            });
+
+            // Match a button/link/span with text "Confirm" (case-insensitive)
+            const confirmButton = this.page
+                .locator('button, a, span, input[type="button"], input[type="submit"]')
+                .filter({ hasText: /^\s*confirm\s*$/i });
+
+            const count = await confirmButton.count();
+            if (count === 0) {
+                console.log('❌ Confirm button not found');
+                await this.page.screenshot({ path: 'confirm_not_found.png' });
+                return false;
+            }
+
+            await confirmButton.first().click({ force: true });
+
+            console.log('✅ Confirm clicked');
+            await this.page.waitForTimeout(2000);
+            await this.page.screenshot({ path: 'after_confirm_click.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking Confirm:', error.message);
+            await this.page.screenshot({ path: 'confirm_error.png' });
+            return false;
+        }
+    }
+
+    async clickOkPopup() {
+        console.log('✅ Clicking OK on second popup...');
+
+        try {
+            const modal = this.page.locator('.modal, [class*="modal"], .popup, [class*="popup"], [role="dialog"]').first();
+            await modal.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {
+                console.log('⚠️ No modal detected within timeout, will still try to locate OK button');
+            });
+
+            const okButton = this.page
+                .locator('button, a, span, input[type="button"], input[type="submit"]')
+                .filter({ hasText: /^\s*ok\s*$/i });
+
+            const count = await okButton.count();
+            if (count === 0) {
+                console.log('❌ OK button not found');
+                await this.page.screenshot({ path: 'ok_not_found.png' });
+                return false;
+            }
+
+            await okButton.first().click({ force: true });
+
+            console.log('✅ OK clicked');
+            await this.page.waitForTimeout(2000);
+            await this.page.screenshot({ path: 'after_ok_click.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking OK:', error.message);
+            await this.page.screenshot({ path: 'ok_error.png' });
+            return false;
+        }
+    }
+
     async performFullRenewal(vcNumber = this.vcNumber, planNameFilter = null) {
         console.log('\n🔄 Starting Full Renewal Process...');
         console.log('='.repeat(60));
@@ -789,9 +861,28 @@ class PackManagementAutomation {
                 return false;
             }
 
-            const renewResult = await this.clickRenewOption();
+            // const renewResult = await this.clickRenewOption();
+            // if (!renewResult) {
+            //     console.log('❌ Failed to click RENEW');
+            //     return false;
+            // }
+
+            // console.log('\n✅ Renewal Process Completed Successfully!');
+                        const renewResult = await this.clickRenewOption();
             if (!renewResult) {
                 console.log('❌ Failed to click RENEW');
+                return false;
+            }
+
+            const confirmResult = await this.clickConfirmPopup();
+            if (!confirmResult) {
+                console.log('❌ Failed to click Confirm');
+                return false;
+            }
+
+            const okResult = await this.clickOkPopup();
+            if (!okResult) {
+                console.log('❌ Failed to click OK');
                 return false;
             }
 
