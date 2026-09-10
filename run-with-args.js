@@ -529,7 +529,7 @@ const CALLBACK_API_URL = 'https://apibng.mobiezy.in/service2/automation_trigger_
 //     }
 // }
 
-async function sendCallback(id, status, response, preEndDate) {
+async function sendCallback(id, status, response, preEndDate, vcNumber) {
     if (!id) {
         console.log('⚠️ No id provided, skipping callback API call');
         return;
@@ -539,7 +539,8 @@ async function sendCallback(id, status, response, preEndDate) {
         id: id,
         status: status,
         response: response,
-        pre_end_date: preEndDate
+        pre_end_date: preEndDate,
+        vc_number: vcNumber
     };
 
     console.log('📤 Callback payload:', JSON.stringify(payload, null, 2));
@@ -651,7 +652,7 @@ async function main() {
                     message: 'Renewal completed successfully'
                 };
                 saveResult(resultData);
-                await sendCallback(requestId, 'success', 'success', packResult.preEndDate || null);
+                await sendCallback(requestId, 'success', 'success', packResult.preEndDate || null, vcNumber);
                 
             } else {
                 console.log('❌ Pack Management tasks failed');
@@ -666,7 +667,7 @@ async function main() {
                     message: 'Renewal failed'
                 };
                 saveResult(resultData);
-                await sendCallback(requestId, 'failure', packResult.error || 'Pack Management failed', null);
+                await sendCallback(requestId, 'failure', packResult.error || 'Pack Management failed', null, vcNumber);
             }
             
         } else {
@@ -682,7 +683,7 @@ async function main() {
                 message: 'Login failed'
             };
             saveResult(resultData);
-            await sendCallback(requestId, 'failure', 'Login failed after multiple attempts', null);
+            await sendCallback(requestId, 'failure', 'Login failed after multiple attempts', null, vcNumber);
         }
         console.log('='.repeat(50));
         
@@ -699,7 +700,7 @@ async function main() {
             message: 'Fatal error occurred'
         };
         saveResult(resultData);
-        await sendCallback(requestId, 'failure', error.message, null);
+        await sendCallback(requestId, 'failure', error.message, null, vcNumber);
         
     } finally {
         if (automation && automation.browser) {
