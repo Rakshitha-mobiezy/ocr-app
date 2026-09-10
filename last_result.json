@@ -1,8 +1,10 @@
 {
-  "status": "failure",
-  "username": "ANUPAMAD4",
-  "vcNumber": "T403221167147",
-  "error": "Login failed",
-  "attempts": 3,
-  "completedAt": "2026-09-02T09:42:16.333Z"
+  "status": "success",
+  "username": "SC",
+  "vcNumber": "N70933646401",
+  "preEndDate": "08-OCT-26",
+  "completedAt": "2026-09-09T08:06:41.431Z",
+  "attempts": 1,
+  "captcha": "337108",
+  "message": "Renewal completed successfully"
 }

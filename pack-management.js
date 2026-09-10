@@ -479,6 +479,428 @@
 
 // module.exports = PackManagementAutomation;
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+// const fs = require('fs');
+// const path = require('path');
+
+// class PackManagementAutomation {
+//     constructor(page) {
+//         this.page = page;
+//         this.vcNumber = 'T403221167147';
+//     }
+
+//     async checkPage() {
+//         try {
+//             const currentUrl = this.page.url();
+//             console.log(`📍 Current URL: ${currentUrl}`);
+
+//             if (!currentUrl.includes('frmAssignPlan.aspx')) {
+//                 console.log('⚠️ Not on Pack Management page');
+//                 return false;
+//             }
+
+//             const hasLoginForm = await this.page.evaluate(() => {
+//                 return document.querySelector('#txtUsername, input[name*="user"]') !== null;
+//             });
+
+//             if (hasLoginForm) {
+//                 console.log('⚠️ Session expired - redirected to login');
+//                 return false;
+//             }
+
+//             console.log('✅ On Pack Management page with valid session');
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error checking page:', error.message);
+//             return false;
+//         }
+//     }
+
+//     async searchVCNumber(vcNumber) {
+//         console.log(`🔍 Searching for VC Number: ${vcNumber}`);
+
+//         try {
+//             const isCorrectPage = await this.checkPage();
+//             if (!isCorrectPage) {
+//                 console.log('❌ Not on Pack Management page');
+//                 return false;
+//             }
+
+//             let searchInput = await this.page.$('#txtSearch, input[id*="txtSearch"], input[class*="txtSearch"]');
+//             if (!searchInput) {
+//                 searchInput = await this.page.$('input[type="text"]');
+//             }
+
+//             if (!searchInput) {
+//                 console.log('❌ Search input not found');
+//                 await this.page.screenshot({ path: 'search_input_not_found.png' });
+//                 return false;
+//             }
+
+//             await searchInput.click();
+//             await searchInput.fill('');
+//             await searchInput.fill(vcNumber);
+//             console.log(`✅ Entered VC Number: ${vcNumber}`);
+
+//             await this.page.waitForTimeout(1000);
+
+//             let searchButton = await this.page.$('button:has-text("Search"), input[value="Search"]');
+//             if (searchButton) {
+//                 await searchButton.click();
+//             } else {
+//                 await this.page.keyboard.press('Enter');
+//             }
+
+//             console.log('✅ Search submitted');
+//             await this.page.waitForTimeout(5000);
+//             await this.page.screenshot({ path: 'after_search.png' });
+
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error searching VC Number:', error.message);
+//             return false;
+//         }
+//     }
+
+//     async clickMainTV() {
+//         console.log('🖱️ Clicking on Main TV...');
+
+//         try {
+//             await this.page.waitForTimeout(2000);
+
+//             let mainTV = await this.page.$('a:has-text("Main TV")');
+//             if (!mainTV) {
+//                 mainTV = await this.page.$('span:has-text("Main TV")');
+//             }
+//             if (!mainTV) {
+//                 mainTV = await this.page.$('td:has-text("Main TV")');
+//             }
+
+//             if (mainTV) {
+//                 await mainTV.click();
+//                 console.log('✅ Clicked Main TV');
+//                 await this.page.waitForTimeout(3000);
+//                 await this.page.screenshot({ path: 'after_main_tv.png' });
+//                 return true;
+//             }
+
+//             console.log('❌ Main TV not found');
+//             await this.page.screenshot({ path: 'main_tv_not_found.png' });
+//             return false;
+
+//         } catch (error) {
+//             console.error('❌ Error clicking Main TV:', error.message);
+//             return false;
+//         }
+//     }
+
+//     /**
+//      * Finds the "Plan Details" table, locates the Action column by reading
+//      * the header row (so it doesn't matter what order columns are in), then
+//      * marks the matching data row with a temporary attribute so a real
+//      * Playwright locator (not a synthetic evaluate-click) can click the
+//      * arrow inside it.
+//      *
+//      * planNameFilter (optional) lets you target a specific plan row when
+//      * there is more than one plan listed for the same customer. If omitted,
+//      * the first data row is used.
+//      */
+//     async clickActionArrow(planNameFilter = null) {
+//         console.log('▶️ Clicking V-shaped arrow in Action column...');
+
+//         try {
+//             await this.page.waitForTimeout(1500);
+
+//             // 1) Read-only pass: find the table/row/column, mark the row.
+//             const target = await this.page.evaluate((planNameFilter) => {
+//                 // clear any stale markers from previous runs
+//                 document.querySelectorAll('[data-automation-target-row]')
+//                     .forEach(r => r.removeAttribute('data-automation-target-row'));
+
+//                 const tables = document.querySelectorAll('table');
+
+//                 for (let t = 0; t < tables.length; t++) {
+//                     const table = tables[t];
+//                     const headerRow = table.querySelector('tr');
+//                     if (!headerRow) continue;
+
+//                     const headerCells = Array.from(headerRow.querySelectorAll('th, td'));
+//                     const actionIdx = headerCells.findIndex(
+//                         c => (c.textContent || '').trim().toLowerCase() === 'action'
+//                     );
+//                     if (actionIdx === -1) continue; // not the right table
+
+//                     const rows = Array.from(table.querySelectorAll('tr')).slice(1); // skip header
+//                     for (let r = 0; r < rows.length; r++) {
+//                         const cells = rows[r].querySelectorAll('td');
+//                         if (cells.length <= actionIdx) continue;
+
+//                         if (planNameFilter) {
+//                             const rowText = rows[r].textContent || '';
+//                             if (!rowText.includes(planNameFilter)) continue;
+//                         }
+
+//                         rows[r].setAttribute('data-automation-target-row', 'true');
+//                         return {
+//                             found: true,
+//                             actionIdx,
+//                             cellHtmlPreview: cells[actionIdx].innerHTML.slice(0, 150)
+//                         };
+//                     }
+//                 }
+
+//                 return { found: false };
+//             }, planNameFilter);
+
+//             if (!target.found) {
+//                 console.log('❌ Could not find the Action column / matching row');
+//                 await this.page.screenshot({ path: 'arrow_not_found.png' });
+//                 return false;
+//             }
+
+//             console.log(`   Located Action cell (index ${target.actionIdx}): ${target.cellHtmlPreview}`);
+
+//             // 2) Real Playwright click on the marked row's Action cell.
+//             const actionCell = this.page
+//                 .locator('tr[data-automation-target-row="true"] td')
+//                 .nth(target.actionIdx);
+
+//             await actionCell.scrollIntoViewIfNeeded();
+
+//             // Prefer clicking an inner icon/link/button if one exists, else the cell itself.
+//             const innerClickable = actionCell.locator('img, svg, i, span, a, button').first();
+//             if (await innerClickable.count() > 0) {
+//                 await innerClickable.click({ force: true });
+//             } else {
+//                 await actionCell.click({ force: true });
+//             }
+
+//             console.log('✅ V-shaped arrow clicked');
+//             await this.page.waitForTimeout(2000);
+//             await this.page.screenshot({ path: 'after_action_click.png' });
+
+//             // Sanity check: did a dropdown actually open?
+//             const dropdownVisible = await this.page.evaluate(() => {
+//                 const menus = document.querySelectorAll('.dropdown-menu, [class*="dropdown-menu"]');
+//                 for (const menu of menus) {
+//                     const style = window.getComputedStyle(menu);
+//                     const rect = menu.getBoundingClientRect();
+//                     if (style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0) {
+//                         return true;
+//                     }
+//                 }
+//                 return false;
+//             });
+
+//             if (!dropdownVisible) {
+//                 console.log('⚠️ Dropdown did not appear after click — retrying with a direct DOM click as fallback');
+//                 await this.page.evaluate(() => {
+//                     const row = document.querySelector('tr[data-automation-target-row="true"]');
+//                     if (!row) return;
+//                     const cells = row.querySelectorAll('td');
+//                     const lastCell = cells[cells.length - 1];
+//                     const el = lastCell.querySelector('img, svg, i, span, a, button') || lastCell;
+//                     el.click();
+//                 });
+//                 await this.page.waitForTimeout(1500);
+//                 await this.page.screenshot({ path: 'after_action_click_retry.png' });
+//             }
+
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error clicking Action arrow:', error.message);
+//             await this.page.screenshot({ path: 'action_error.png' });
+//             return false;
+//         } finally {
+//             // Clean up the marker so it doesn't interfere with later steps.
+//             await this.page.evaluate(() => {
+//                 document.querySelectorAll('[data-automation-target-row]')
+//                     .forEach(r => r.removeAttribute('data-automation-target-row'));
+//             }).catch(() => {});
+//         }
+//     }
+
+//     async clickRenewOption() {
+//         console.log('🔄 Clicking RENEW from dropdown...');
+
+//         try {
+//             // Wait for a visible dropdown menu to show up.
+//             const dropdown = this.page.locator('.dropdown-menu, [class*="dropdown-menu"]').first();
+//             await dropdown.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
+//                 console.log('⚠️ No dropdown became visible within timeout, will still try to locate RENEW');
+//             });
+
+//             // Match an exact "RENEW" text (case-insensitive), inside any visible dropdown.
+//             const renewOption = this.page
+//                 .locator('.dropdown-menu li, [class*="dropdown-menu"] li, .dropdown-menu a, [class*="dropdown-menu"] a, .dropdown-menu button, [class*="dropdown-menu"] button')
+//                 .filter({ hasText: /^\s*renew\s*$/i });
+
+//             const count = await renewOption.count();
+//             if (count === 0) {
+//                 console.log('❌ RENEW option not found in dropdown');
+//                 await this.page.screenshot({ path: 'renew_not_found.png' });
+//                 return false;
+//             }
+
+//             await renewOption.first().click({ force: true });
+
+//             console.log('✅ RENEW clicked');
+//             await this.page.waitForTimeout(3000);
+//             await this.page.screenshot({ path: 'after_renew_click.png' });
+
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error clicking RENEW:', error.message);
+//             await this.page.screenshot({ path: 'renew_error.png' });
+//             return false;
+//         }
+//     }
+
+//             async clickConfirmPopup() {
+//         console.log('✅ Clicking CONFIRM on first popup...');
+
+//         try {
+//             const confirmButton = this.page
+//                 .locator('button, a, span, input[type="button"], input[type="submit"]')
+//                 .filter({ hasText: /^\s*confirm\s*$/i });
+
+//             // Wait for it to actually become VISIBLE (not just present in DOM)
+//             await confirmButton.first().waitFor({ state: 'visible', timeout: 10000 });
+//             await confirmButton.first().click();
+
+//             console.log('✅ Confirm clicked');
+
+//             // This triggers an ASP.NET postback (WebForm_DoPostBackWithOptions) —
+//             // wait for the page to settle before looking for the next popup
+//             await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+//                 console.log('⚠️ networkidle wait timed out, continuing anyway');
+//             });
+//             await this.page.waitForTimeout(1500);
+//             await this.page.screenshot({ path: 'after_confirm_click.png' });
+
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error clicking Confirm:', error.message);
+//             await this.page.screenshot({ path: 'confirm_error.png' });
+//             return false;
+//         }
+//     }
+
+//         async clickYesPopup() {
+//         console.log('✅ Clicking YES on second popup...');
+
+//         try {
+//             // Wait for the SECOND confirmation modal specifically —
+//             // it has distinct text "Are you sure you want to renew the plan"
+//             // (no question mark, no "with following details"), so we can
+//             // wait for that exact modal to appear rather than the first one.
+//             const secondModalText = this.page.locator('text=/Are you sure you want to renew the plan/i');
+//             await secondModalText.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {
+//                 console.log('⚠️ Distinct second-modal text not found, falling back to generic Yes search');
+//             });
+
+//             const yesButton = this.page
+//                 .locator('button:visible, a:visible, span:visible, input[type="button"]:visible, input[type="submit"]:visible')
+//                 .filter({ hasText: /^\s*yes\s*$/i });
+
+//             await yesButton.first().waitFor({ state: 'visible', timeout: 15000 });
+
+//             const outerHtml = await yesButton.first().evaluate(el => el.outerHTML).catch(() => 'n/a');
+//             console.log(`   Yes element resolved to: ${outerHtml}`);
+
+//             await yesButton.first().click();
+
+//             console.log('✅ Yes clicked');
+
+//             await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+//                 console.log('⚠️ networkidle wait timed out, continuing anyway');
+//             });
+//             await this.page.waitForTimeout(1500);
+//             await this.page.screenshot({ path: 'after_yes_click.png' });
+
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error clicking Yes:', error.message);
+//             await this.page.screenshot({ path: 'yes_error.png' });
+//             return false;
+//         }
+//     }
+
+//     async performFullRenewal(vcNumber = this.vcNumber, planNameFilter = null) {
+//         console.log('\n🔄 Starting Full Renewal Process...');
+//         console.log('='.repeat(60));
+
+//         try {
+//             const isCorrectPage = await this.checkPage();
+//             if (!isCorrectPage) {
+//                 console.log('❌ Not on Pack Management page');
+//                 return false;
+//             }
+
+//             const searchResult = await this.searchVCNumber(vcNumber);
+//             if (!searchResult) {
+//                 console.log('❌ Failed to search VC Number');
+//                 return false;
+//             }
+
+//             const mainTVResult = await this.clickMainTV();
+//             if (!mainTVResult) {
+//                 console.log('❌ Failed to click Main TV');
+//                 return false;
+//             }
+
+//             const actionResult = await this.clickActionArrow(planNameFilter);
+//             if (!actionResult) {
+//                 console.log('❌ Failed to click Action arrow');
+//                 return false;
+//             }
+
+//             // const renewResult = await this.clickRenewOption();
+//             // if (!renewResult) {
+//             //     console.log('❌ Failed to click RENEW');
+//             //     return false;
+//             // }
+
+//             // console.log('\n✅ Renewal Process Completed Successfully!');
+//                         const renewResult = await this.clickRenewOption();
+//             if (!renewResult) {
+//                 console.log('❌ Failed to click RENEW');
+//                 return false;
+//             }
+
+//             const confirmResult = await this.clickConfirmPopup();
+//             if (!confirmResult) {
+//                 console.log('❌ Failed to click Confirm');
+//                 return false;
+//             }
+
+//             const okResult = await this.clickYesPopup();
+//             if (!yesResult) {
+//                 console.log('❌ Failed to click yes');
+//                 return false;
+//             }
+
+//             console.log('\n✅ Renewal Process Completed Successfully!');
+//             console.log('='.repeat(60));
+//             return true;
+
+//         } catch (error) {
+//             console.error('❌ Error in renewal process:', error.message);
+//             return false;
+//         }
+//     }
+// }
+
+// module.exports = PackManagementAutomation;
+
 
 const fs = require('fs');
 const path = require('path');
@@ -603,9 +1025,7 @@ class PackManagementAutomation {
      * Playwright locator (not a synthetic evaluate-click) can click the
      * arrow inside it.
      *
-     * planNameFilter (optional) lets you target a specific plan row when
-     * there is more than one plan listed for the same customer. If omitted,
-     * the first data row is used.
+     * KEPT FOR FUTURE USE — not currently called in performFullRenewal.
      */
     async clickActionArrow(planNameFilter = null) {
         console.log('▶️ Clicking V-shaped arrow in Action column...');
@@ -613,9 +1033,7 @@ class PackManagementAutomation {
         try {
             await this.page.waitForTimeout(1500);
 
-            // 1) Read-only pass: find the table/row/column, mark the row.
             const target = await this.page.evaluate((planNameFilter) => {
-                // clear any stale markers from previous runs
                 document.querySelectorAll('[data-automation-target-row]')
                     .forEach(r => r.removeAttribute('data-automation-target-row'));
 
@@ -630,9 +1048,9 @@ class PackManagementAutomation {
                     const actionIdx = headerCells.findIndex(
                         c => (c.textContent || '').trim().toLowerCase() === 'action'
                     );
-                    if (actionIdx === -1) continue; // not the right table
+                    if (actionIdx === -1) continue;
 
-                    const rows = Array.from(table.querySelectorAll('tr')).slice(1); // skip header
+                    const rows = Array.from(table.querySelectorAll('tr')).slice(1);
                     for (let r = 0; r < rows.length; r++) {
                         const cells = rows[r].querySelectorAll('td');
                         if (cells.length <= actionIdx) continue;
@@ -662,14 +1080,12 @@ class PackManagementAutomation {
 
             console.log(`   Located Action cell (index ${target.actionIdx}): ${target.cellHtmlPreview}`);
 
-            // 2) Real Playwright click on the marked row's Action cell.
             const actionCell = this.page
                 .locator('tr[data-automation-target-row="true"] td')
                 .nth(target.actionIdx);
 
             await actionCell.scrollIntoViewIfNeeded();
 
-            // Prefer clicking an inner icon/link/button if one exists, else the cell itself.
             const innerClickable = actionCell.locator('img, svg, i, span, a, button').first();
             if (await innerClickable.count() > 0) {
                 await innerClickable.click({ force: true });
@@ -681,7 +1097,6 @@ class PackManagementAutomation {
             await this.page.waitForTimeout(2000);
             await this.page.screenshot({ path: 'after_action_click.png' });
 
-            // Sanity check: did a dropdown actually open?
             const dropdownVisible = await this.page.evaluate(() => {
                 const menus = document.querySelectorAll('.dropdown-menu, [class*="dropdown-menu"]');
                 for (const menu of menus) {
@@ -715,7 +1130,6 @@ class PackManagementAutomation {
             await this.page.screenshot({ path: 'action_error.png' });
             return false;
         } finally {
-            // Clean up the marker so it doesn't interfere with later steps.
             await this.page.evaluate(() => {
                 document.querySelectorAll('[data-automation-target-row]')
                     .forEach(r => r.removeAttribute('data-automation-target-row'));
@@ -723,17 +1137,16 @@ class PackManagementAutomation {
         }
     }
 
+    // KEPT FOR FUTURE USE — not currently called in performFullRenewal.
     async clickRenewOption() {
         console.log('🔄 Clicking RENEW from dropdown...');
 
         try {
-            // Wait for a visible dropdown menu to show up.
             const dropdown = this.page.locator('.dropdown-menu, [class*="dropdown-menu"]').first();
             await dropdown.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
                 console.log('⚠️ No dropdown became visible within timeout, will still try to locate RENEW');
             });
 
-            // Match an exact "RENEW" text (case-insensitive), inside any visible dropdown.
             const renewOption = this.page
                 .locator('.dropdown-menu li, [class*="dropdown-menu"] li, .dropdown-menu a, [class*="dropdown-menu"] a, .dropdown-menu button, [class*="dropdown-menu"] button')
                 .filter({ hasText: /^\s*renew\s*$/i });
@@ -760,7 +1173,8 @@ class PackManagementAutomation {
         }
     }
 
-            async clickConfirmPopup() {
+    // KEPT FOR FUTURE USE — not currently called in performFullRenewal.
+    async clickConfirmPopup() {
         console.log('✅ Clicking CONFIRM on first popup...');
 
         try {
@@ -768,14 +1182,11 @@ class PackManagementAutomation {
                 .locator('button, a, span, input[type="button"], input[type="submit"]')
                 .filter({ hasText: /^\s*confirm\s*$/i });
 
-            // Wait for it to actually become VISIBLE (not just present in DOM)
             await confirmButton.first().waitFor({ state: 'visible', timeout: 10000 });
             await confirmButton.first().click();
 
             console.log('✅ Confirm clicked');
 
-            // This triggers an ASP.NET postback (WebForm_DoPostBackWithOptions) —
-            // wait for the page to settle before looking for the next popup
             await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
                 console.log('⚠️ networkidle wait timed out, continuing anyway');
             });
@@ -791,14 +1202,11 @@ class PackManagementAutomation {
         }
     }
 
-        async clickYesPopup() {
+    // KEPT FOR FUTURE USE — not currently called in performFullRenewal.
+    async clickYesPopup() {
         console.log('✅ Clicking YES on second popup...');
 
         try {
-            // Wait for the SECOND confirmation modal specifically —
-            // it has distinct text "Are you sure you want to renew the plan"
-            // (no question mark, no "with following details"), so we can
-            // wait for that exact modal to appear rather than the first one.
             const secondModalText = this.page.locator('text=/Are you sure you want to renew the plan/i');
             await secondModalText.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {
                 console.log('⚠️ Distinct second-modal text not found, falling back to generic Yes search');
@@ -832,7 +1240,351 @@ class PackManagementAutomation {
         }
     }
 
-    async performFullRenewal(vcNumber = this.vcNumber, planNameFilter = null) {
+    /**
+     * NEW: Clicks the "Quick Recharge" button on the Customer Details page
+     * (top-right, next to "Align Date" — see screenshot 1).
+     */
+    async clickQuickRecharge() {
+        console.log('💳 Clicking Quick Recharge...');
+
+        try {
+            const quickRechargeBtn = this.page
+                .locator('button, a, input[type="button"], input[type="submit"]')
+                .filter({ hasText: /^\s*quick recharge\s*$/i });
+
+            await quickRechargeBtn.first().waitFor({ state: 'visible', timeout: 10000 });
+            await quickRechargeBtn.first().click();
+
+            console.log('✅ Quick Recharge clicked');
+
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(1500);
+            await this.page.screenshot({ path: 'after_quick_recharge_click.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking Quick Recharge:', error.message);
+            await this.page.screenshot({ path: 'quick_recharge_error.png' });
+            return false;
+        }
+    }
+
+    /**
+     * NEW: Clicks "submit" on the Quick Recharge page (see screenshot 2).
+     * If the plan table hasn't loaded yet (search not auto-triggered),
+     * it tries clicking a visible Search button first as a fallback.
+     */
+    async clickSubmitQuickRecharge() {
+        console.log('📨 Clicking Submit on Quick Recharge page...');
+
+        try {
+            let submitBtn = this.page
+                .locator('button, a, input[type="button"], input[type="submit"]')
+                .filter({ hasText: /^\s*submit\s*$/i });
+
+            // If Submit isn't visible yet, the search may need to run first.
+            const submitVisibleAlready = await submitBtn.first().isVisible().catch(() => false);
+            if (!submitVisibleAlready) {
+                console.log('⚠️ Submit not visible yet — trying Search first');
+                const searchBtn = this.page
+                    .locator('button, input[type="button"], input[type="submit"]')
+                    .filter({ hasText: /^\s*search\s*$/i });
+
+                if (await searchBtn.count() > 0) {
+                    await searchBtn.first().click();
+                    await this.page.waitForTimeout(2000);
+                }
+            }
+
+            await submitBtn.first().waitFor({ state: 'visible', timeout: 10000 });
+            await submitBtn.first().click();
+
+            console.log('✅ Submit clicked');
+
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(1500);
+            await this.page.screenshot({ path: 'after_submit_click.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking Submit:', error.message);
+            await this.page.screenshot({ path: 'submit_error.png' });
+            return false;
+        }
+    }
+    
+           /**
+     * Clicks "Confirm" on the Add Plan popup by finding the button that is
+     * ACTUALLY visible on screen right now (checking real geometry, not
+     * just DOM presence), then performing a real mouse click at its exact
+     * coordinates. This avoids accidentally clicking a hidden/duplicate
+     * element that happens to share the same ID or text.
+     */
+    async clickConfirmAddPlan() {
+        console.log('✅ Clicking Confirm on Add Plan popup...');
+
+        try {
+            // Give any modal animation / AJAX partial postback time to finish rendering
+            await this.page.waitForTimeout(2000);
+
+            const target = await this.page.evaluate(() => {
+                const candidates = Array.from(
+                    document.querySelectorAll('input[type="submit"], input[type="button"], button, a, span')
+                ).filter(el => /confirm/i.test((el.value || el.textContent || '').trim()));
+
+                for (const el of candidates) {
+                    const rect = el.getBoundingClientRect();
+                    const style = window.getComputedStyle(el);
+                    const isVisible =
+                        rect.width > 0 &&
+                        rect.height > 0 &&
+                        style.visibility !== 'hidden' &&
+                        style.display !== 'none' &&
+                        el.offsetParent !== null;
+
+                    if (isVisible) {
+                        return {
+                            found: true,
+                            x: rect.x + rect.width / 2,
+                            y: rect.y + rect.height / 2,
+                            id: el.id,
+                            outerHTML: el.outerHTML.slice(0, 200)
+                        };
+                    }
+                }
+                return { found: false };
+            });
+
+            if (!target.found) {
+                console.log('❌ No genuinely visible Confirm button found on page');
+                await this.page.screenshot({ path: 'confirm_add_plan_not_visible.png' });
+                return false;
+            }
+
+            console.log(`   Found visible Confirm button (id=${target.id}): ${target.outerHTML}`);
+
+            // Real mouse click at the actual on-screen coordinates —
+            // this behaves exactly like a genuine user click, unlike a JS .click()
+            await this.page.mouse.click(target.x, target.y);
+
+            console.log('✅ Confirm (Add Plan) clicked via real mouse click');
+
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(2000);
+            await this.page.screenshot({ path: 'after_confirm_add_plan.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking Confirm (Add Plan):', error.message);
+            await this.page.screenshot({ path: 'confirm_add_plan_error.png' });
+            return false;
+        }
+    }
+
+        /**
+     * Clicks "OK" on the popup that appears right after the Add Plan
+     * confirmation. Uses the same robust "find genuinely visible element,
+     * click at real coordinates" approach as clickConfirmAddPlan, since
+     * these ASP.NET popups have unreliable visibility detection.
+     */
+    async clickOkPopup() {
+        console.log('👌 Clicking OK on final popup...');
+
+        try {
+            await this.page.waitForTimeout(2000);
+
+            const target = await this.page.evaluate(() => {
+                const candidates = Array.from(
+                    document.querySelectorAll('input[type="submit"], input[type="button"], button, a, span')
+                ).filter(el => /^\s*ok\s*$/i.test((el.value || el.textContent || '').trim()));
+
+                for (const el of candidates) {
+                    const rect = el.getBoundingClientRect();
+                    const style = window.getComputedStyle(el);
+                    const isVisible =
+                        rect.width > 0 &&
+                        rect.height > 0 &&
+                        style.visibility !== 'hidden' &&
+                        style.display !== 'none' &&
+                        el.offsetParent !== null;
+
+                    if (isVisible) {
+                        return { found: true, x: rect.x + rect.width / 2, y: rect.y + rect.height / 2, id: el.id };
+                    }
+                }
+                return { found: false };
+            });
+
+            if (!target.found) {
+                console.log('❌ No genuinely visible OK button found');
+                await this.page.screenshot({ path: 'ok_popup_not_visible.png' });
+                return false;
+            }
+
+            console.log(`   Found visible OK button (id=${target.id})`);
+            await this.page.mouse.click(target.x, target.y);
+            console.log('✅ OK clicked via real mouse click');
+
+            await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+                console.log('⚠️ networkidle wait timed out, continuing anyway');
+            });
+            await this.page.waitForTimeout(1500);
+            await this.page.screenshot({ path: 'after_ok_click.png' });
+
+            return true;
+
+        } catch (error) {
+            console.error('❌ Error clicking OK:', error.message);
+            await this.page.screenshot({ path: 'ok_popup_error.png' });
+            return false;
+        }
+    }
+
+    /**
+     * Re-searches the VC number, clicks Main TV again, then reads the
+     * "Valid Upto" column from the Plan Details table for the matching
+     * row. Returns the date string (e.g. "08-OCT-26") or null if not found.
+     */
+    async extractPreEndDate(vcNumber) {
+        console.log('📅 Fetching updated Valid Upto (pre-end) date...');
+
+        try {
+            const searchResult = await this.searchVCNumber(vcNumber);
+            if (!searchResult) {
+                console.log('❌ Could not re-search VC Number for date extraction');
+                return null;
+            }
+
+            const mainTVResult = await this.clickMainTV();
+            if (!mainTVResult) {
+                console.log('❌ Could not click Main TV for date extraction');
+                return null;
+            }
+
+            await this.page.waitForTimeout(1500);
+
+            const preEndDate = await this.page.evaluate(() => {
+                const tables = document.querySelectorAll('table');
+                for (const table of tables) {
+                    const headerRow = table.querySelector('tr');
+                    if (!headerRow) continue;
+
+                    const headerCells = Array.from(headerRow.querySelectorAll('th, td'));
+                    const validUptoIdx = headerCells.findIndex(
+                        c => (c.textContent || '').trim().toLowerCase() === 'valid upto'
+                    );
+                    if (validUptoIdx === -1) continue;
+
+                    const rows = Array.from(table.querySelectorAll('tr')).slice(1);
+                    for (const row of rows) {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length > validUptoIdx) {
+                            const text = (cells[validUptoIdx].textContent || '').trim();
+                            if (text) return text;
+                        }
+                    }
+                }
+                return null;
+            });
+
+            console.log(`   Extracted Valid Upto: ${preEndDate || 'NOT FOUND'}`);
+            await this.page.screenshot({ path: 'after_extract_pre_end_date.png' });
+
+            return preEndDate;
+
+        } catch (error) {
+            console.error('❌ Error extracting pre-end date:', error.message);
+            return null;
+        }
+    }
+
+    // async performFullRenewal(vcNumber = this.vcNumber, planNameFilter = null) {
+    //     console.log('\n🔄 Starting Full Renewal Process...');
+    //     console.log('='.repeat(60));
+
+    //     try {
+    //         const isCorrectPage = await this.checkPage();
+    //         if (!isCorrectPage) {
+    //             console.log('❌ Not on Pack Management page');
+    //             return false;
+    //         }
+
+    //         const searchResult = await this.searchVCNumber(vcNumber);
+    //         if (!searchResult) {
+    //             console.log('❌ Failed to search VC Number');
+    //             return false;
+    //         }
+
+    //         const mainTVResult = await this.clickMainTV();
+    //         if (!mainTVResult) {
+    //             console.log('❌ Failed to click Main TV');
+    //             return false;
+    //         }
+
+    //         // ---- OLD FLOW (V-arrow → Renew → Confirm → Yes) — COMMENTED OUT, KEPT FOR FUTURE USE ----
+    //         // const actionResult = await this.clickActionArrow(planNameFilter);
+    //         // if (!actionResult) {
+    //         //     console.log('❌ Failed to click Action arrow');
+    //         //     return false;
+    //         // }
+
+    //         // const renewResult = await this.clickRenewOption();
+    //         // if (!renewResult) {
+    //         //     console.log('❌ Failed to click RENEW');
+    //         //     return false;
+    //         // }
+
+    //         // const confirmResult = await this.clickConfirmPopup();
+    //         // if (!confirmResult) {
+    //         //     console.log('❌ Failed to click Confirm');
+    //         //     return false;
+    //         // }
+
+    //         // const yesResult = await this.clickYesPopup();
+    //         // if (!yesResult) {
+    //         //     console.log('❌ Failed to click yes');
+    //         //     return false;
+    //         // }
+
+    //         // ---- NEW FLOW (Quick Recharge → Submit) ----
+    //         const quickRechargeResult = await this.clickQuickRecharge();
+    //         if (!quickRechargeResult) {
+    //             console.log('❌ Failed to click Quick Recharge');
+    //             return false;
+    //         }
+
+    //         const submitResult = await this.clickSubmitQuickRecharge();
+    //         if (!submitResult) {
+    //             console.log('❌ Failed to click Submit');
+    //             return false;
+    //         }
+
+    //         const confirmAddResult = await this.clickConfirmAddPlan();
+    //         if (!confirmAddResult) {
+    //             console.log('❌ Failed to click Confirm on Add Plan popup');
+    //             return false;
+    //         }
+
+    //         console.log('\n✅ Renewal Process Completed Successfully!');
+    //         console.log('='.repeat(60));
+    //         return true;
+
+    //     } catch (error) {
+    //         console.error('❌ Error in renewal process:', error.message);
+    //         return false;
+    //     }
+    // }
+
+        async performFullRenewal(vcNumber = this.vcNumber, planNameFilter = null) {
         console.log('\n🔄 Starting Full Renewal Process...');
         console.log('='.repeat(60));
 
@@ -840,59 +1592,54 @@ class PackManagementAutomation {
             const isCorrectPage = await this.checkPage();
             if (!isCorrectPage) {
                 console.log('❌ Not on Pack Management page');
-                return false;
+                return { success: false, error: 'Not on Pack Management page', preEndDate: null };
             }
 
             const searchResult = await this.searchVCNumber(vcNumber);
             if (!searchResult) {
                 console.log('❌ Failed to search VC Number');
-                return false;
+                return { success: false, error: 'Failed to search VC Number', preEndDate: null };
             }
 
             const mainTVResult = await this.clickMainTV();
             if (!mainTVResult) {
                 console.log('❌ Failed to click Main TV');
-                return false;
+                return { success: false, error: 'Failed to click Main TV', preEndDate: null };
             }
 
-            const actionResult = await this.clickActionArrow(planNameFilter);
-            if (!actionResult) {
-                console.log('❌ Failed to click Action arrow');
-                return false;
+            const quickRechargeResult = await this.clickQuickRecharge();
+            if (!quickRechargeResult) {
+                console.log('❌ Failed to click Quick Recharge');
+                return { success: false, error: 'Failed to click Quick Recharge', preEndDate: null };
             }
 
-            // const renewResult = await this.clickRenewOption();
-            // if (!renewResult) {
-            //     console.log('❌ Failed to click RENEW');
-            //     return false;
-            // }
-
-            // console.log('\n✅ Renewal Process Completed Successfully!');
-                        const renewResult = await this.clickRenewOption();
-            if (!renewResult) {
-                console.log('❌ Failed to click RENEW');
-                return false;
+            const submitResult = await this.clickSubmitQuickRecharge();
+            if (!submitResult) {
+                console.log('❌ Failed to click Submit');
+                return { success: false, error: 'Failed to click Submit', preEndDate: null };
             }
 
-            const confirmResult = await this.clickConfirmPopup();
-            if (!confirmResult) {
-                console.log('❌ Failed to click Confirm');
-                return false;
+            const confirmAddResult = await this.clickConfirmAddPlan();
+            if (!confirmAddResult) {
+                console.log('❌ Failed to click Confirm on Add Plan popup');
+                return { success: false, error: 'Failed to click Confirm on Add Plan popup', preEndDate: null };
             }
 
-            const okResult = await this.clickYesPopup();
-            if (!yesResult) {
-                console.log('❌ Failed to click yes');
-                return false;
+            const okResult = await this.clickOkPopup();
+            if (!okResult) {
+                console.log('❌ Failed to click OK on final popup');
+                return { success: false, error: 'Failed to click OK on final popup', preEndDate: null };
             }
+
+            const preEndDate = await this.extractPreEndDate(vcNumber);
 
             console.log('\n✅ Renewal Process Completed Successfully!');
             console.log('='.repeat(60));
-            return true;
+            return { success: true, error: null, preEndDate: preEndDate };
 
         } catch (error) {
             console.error('❌ Error in renewal process:', error.message);
-            return false;
+            return { success: false, error: error.message, preEndDate: null };
         }
     }
 }

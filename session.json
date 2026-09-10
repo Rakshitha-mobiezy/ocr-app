@@ -2,7 +2,7 @@
   "cookies": [
     {
       "name": "ASP.NET_SessionId",
-      "value": "rzezh0lhx1ddlddbcvv2ppdf",
+      "value": "p1mepev33l0kt14mxoxjzcrv",
       "domain": "partners.hathway-connect.com",
       "path": "/",
       "expires": -1,
@@ -12,8 +12,8 @@
     },
     {
       "name": "ASP.NET_SessionId",
-      "value": "qfkmwyvubcxek1yhizwygpnh",
-      "domain": "cg.hathway-connect.com",
+      "value": "wedk22oury3id2jtzztmznbm",
+      "domain": "east.hathway-connect.com",
       "path": "/",
       "expires": -1,
       "httpOnly": true,
@@ -22,20 +22,20 @@
     },
     {
       "name": "myCookie",
-      "value": "9b91df8fcdc4=wA21+3oVzS4wDrQ4s6OY60k7gq09FEYFnV33QYyEogqYyCl1AdWIVoBlUM0UWVscjsrJCToiBlqRPgsUiGXCrA2B6XROaDnZ5O3aBQkdA90l/ODm9IVwPrH5S9FuQcHomu5I6crAXua4wqKE1fiHA7jmd4cOyGTRW+5xE32mo30=",
-      "domain": "cg.hathway-connect.com",
+      "value": "9b91df8fcdc4=gE6C94U0Ye3M3JPI5Y8gBCPiaTGDlWQrTMwHRZSaBTSmvbNX4t3jBIsT8Dok8RX0kTjUabrqbhxvXEtw7K3NJLNnSh0rFIf+M4auWA4BKuoZiNmuhx1f+v0KifeLu+F0ECcVK6/mwaH8FPXWsW+XKYhVJuN6mxxwESDrRsxTG0c=",
+      "domain": "east.hathway-connect.com",
       "path": "/",
-      "expires": 1788259412.498374,
+      "expires": 1788942939.47104,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "AuthToken",
-      "value": "_JmZ4C+SFi-y8bN",
-      "domain": "cg.hathway-connect.com",
+      "value": "H5XKn#4DgTwj+M9",
+      "domain": "east.hathway-connect.com",
       "path": "/",
-      "expires": 1788258812.498488,
+      "expires": 1788942339.471077,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -45,7 +45,7 @@
     "cookies": [
       {
         "name": "ASP.NET_SessionId",
-        "value": "rzezh0lhx1ddlddbcvv2ppdf",
+        "value": "p1mepev33l0kt14mxoxjzcrv",
         "domain": "partners.hathway-connect.com",
         "path": "/",
         "expires": -1,
@@ -55,8 +55,8 @@
       },
       {
         "name": "ASP.NET_SessionId",
-        "value": "qfkmwyvubcxek1yhizwygpnh",
-        "domain": "cg.hathway-connect.com",
+        "value": "wedk22oury3id2jtzztmznbm",
+        "domain": "east.hathway-connect.com",
         "path": "/",
         "expires": -1,
         "httpOnly": true,
@@ -65,20 +65,20 @@
       },
       {
         "name": "myCookie",
-        "value": "9b91df8fcdc4=wA21+3oVzS4wDrQ4s6OY60k7gq09FEYFnV33QYyEogqYyCl1AdWIVoBlUM0UWVscjsrJCToiBlqRPgsUiGXCrA2B6XROaDnZ5O3aBQkdA90l/ODm9IVwPrH5S9FuQcHomu5I6crAXua4wqKE1fiHA7jmd4cOyGTRW+5xE32mo30=",
-        "domain": "cg.hathway-connect.com",
+        "value": "9b91df8fcdc4=gE6C94U0Ye3M3JPI5Y8gBCPiaTGDlWQrTMwHRZSaBTSmvbNX4t3jBIsT8Dok8RX0kTjUabrqbhxvXEtw7K3NJLNnSh0rFIf+M4auWA4BKuoZiNmuhx1f+v0KifeLu+F0ECcVK6/mwaH8FPXWsW+XKYhVJuN6mxxwESDrRsxTG0c=",
+        "domain": "east.hathway-connect.com",
         "path": "/",
-        "expires": 1788259412.498374,
+        "expires": 1788942939.47104,
         "httpOnly": true,
         "secure": true,
         "sameSite": "Lax"
       },
       {
         "name": "AuthToken",
-        "value": "_JmZ4C+SFi-y8bN",
-        "domain": "cg.hathway-connect.com",
+        "value": "H5XKn#4DgTwj+M9",
+        "domain": "east.hathway-connect.com",
         "path": "/",
-        "expires": 1788258812.498488,
+        "expires": 1788942339.471077,
         "httpOnly": true,
         "secure": true,
         "sameSite": "Lax"
@@ -90,12 +90,12 @@
         "localStorage": [
           {
             "name": "rc::a",
-            "value": "azZ6NGg4a2pjYWV2"
+            "value": "andtM3ExYnhpa3Z5"
           }
         ]
       }
     ]
   },
-  "timestamp": "2026-09-01T10:13:47.292Z",
+  "timestamp": "2026-09-09T08:05:50.498Z",
   "baseUrl": "https://cg.hathway-connect.com"
 }

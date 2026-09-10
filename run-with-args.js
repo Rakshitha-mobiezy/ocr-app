@@ -503,6 +503,59 @@ function saveResult(resultData) {
     }
 }
 
+// Sends the final result to the external callback API.
+// PLACEHOLDER URL — replace this with the real callback endpoint once it's ready.
+const CALLBACK_API_URL = 'https://example.com/api/renewal-callback'; // <-- REPLACE THIS URL
+
+// async function sendCallback(id, status, response, preEndDate) {
+//     if (!id) {
+//         console.log('⚠️ No id provided, skipping callback API call');
+//         return;
+//     }
+//     try {
+//         const res = await fetch(CALLBACK_API_URL, {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({
+//                 id: id,
+//                 status: status,
+//                 response: response,
+//                 pre_end_date: preEndDate
+//             })
+//         });
+//         console.log(`📡 Callback sent. Response status: ${res.status}`);
+//     } catch (error) {
+//         console.error('❌ Failed to send callback:', error.message);
+//     }
+// }
+
+async function sendCallback(id, status, response, preEndDate) {
+    if (!id) {
+        console.log('⚠️ No id provided, skipping callback API call');
+        return;
+    }
+
+    const payload = {
+        id: id,
+        status: status,
+        response: response,
+        pre_end_date: preEndDate
+    };
+
+    console.log('📤 Callback payload:', JSON.stringify(payload, null, 2));
+
+    try {
+        const res = await fetch(CALLBACK_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        console.log(`📡 Callback sent. Response status: ${res.status}`);
+    } catch (error) {
+        console.error('❌ Failed to send callback:', error.message);
+    }
+}
+
 async function main() {
     console.log('🚀 Starting Login Automation with Python OCR');
     console.log('='.repeat(50));
@@ -514,6 +567,7 @@ async function main() {
     const password = args.password || config.password;
     const vcNumber = args.vc || args.vcnumber || config.vcNumber;
     const maxRetries = args.retries || config.maxRetries;
+        const requestId = args.id || null; 
     
     console.log(`👤 Username: ${username}`);
     console.log(`🔢 VC Number: ${vcNumber}`);
@@ -543,29 +597,61 @@ async function main() {
             
             const packResult = await automation.performPackManagementTasks(vcNumber);
             
-            if (packResult) {
+            // if (packResult) {
+            //     console.log('✅ All tasks completed successfully!');
+                
+            //     // Extract pre-end date
+            //     try {
+            //         preEndDate = await automation.getPreEndDate();
+            //         console.log(`📅 Pre-End Date: ${preEndDate || 'Not found'}`);
+            //     } catch (error) {
+            //         console.log('⚠️ Could not extract pre-end date:', error.message);
+            //     }
+                
+            //     // Save SUCCESS result with pre-end date
+            //     const resultData = {
+            //         status: 'success',
+            //         username: username,
+            //         vcNumber: vcNumber,
+            //         preEndDate: preEndDate || null,
+            //         completedAt: new Date().toISOString(),
+            //         attempts: result.attempts,
+            //         captcha: result.captcha,
+            //         message: 'Renewal completed successfully'
+            //     };
+            //     saveResult(resultData);
+                
+            // }
+            //  else {
+            //     console.log('❌ Pack Management tasks failed');
+            //     const resultData = {
+            //         status: 'failure',
+            //         username: username,
+            //         vcNumber: vcNumber,
+            //         error: 'Pack Management failed - could not click Renew button',
+            //         completedAt: new Date().toISOString(),
+            //         attempts: result.attempts,
+            //         captcha: result.captcha,
+            //         message: 'Renewal failed'
+            //     };
+            //     saveResult(resultData);
+            // }
+            if (packResult.success) {
                 console.log('✅ All tasks completed successfully!');
+                console.log(`📅 Pre-End Date: ${packResult.preEndDate || 'Not found'}`);
                 
-                // Extract pre-end date
-                try {
-                    preEndDate = await automation.getPreEndDate();
-                    console.log(`📅 Pre-End Date: ${preEndDate || 'Not found'}`);
-                } catch (error) {
-                    console.log('⚠️ Could not extract pre-end date:', error.message);
-                }
-                
-                // Save SUCCESS result with pre-end date
                 const resultData = {
                     status: 'success',
                     username: username,
                     vcNumber: vcNumber,
-                    preEndDate: preEndDate || null,
+                    preEndDate: packResult.preEndDate || null,
                     completedAt: new Date().toISOString(),
                     attempts: result.attempts,
                     captcha: result.captcha,
                     message: 'Renewal completed successfully'
                 };
                 saveResult(resultData);
+                await sendCallback(requestId, 'success', 'success', packResult.preEndDate || null);
                 
             } else {
                 console.log('❌ Pack Management tasks failed');
@@ -573,13 +659,14 @@ async function main() {
                     status: 'failure',
                     username: username,
                     vcNumber: vcNumber,
-                    error: 'Pack Management failed - could not click Renew button',
+                    error: packResult.error || 'Pack Management failed',
                     completedAt: new Date().toISOString(),
                     attempts: result.attempts,
                     captcha: result.captcha,
                     message: 'Renewal failed'
                 };
                 saveResult(resultData);
+                await sendCallback(requestId, 'failure', packResult.error || 'Pack Management failed', null);
             }
             
         } else {
@@ -595,6 +682,7 @@ async function main() {
                 message: 'Login failed'
             };
             saveResult(resultData);
+            await sendCallback(requestId, 'failure', 'Login failed after multiple attempts', null);
         }
         console.log('='.repeat(50));
         
@@ -611,6 +699,7 @@ async function main() {
             message: 'Fatal error occurred'
         };
         saveResult(resultData);
+        await sendCallback(requestId, 'failure', error.message, null);
         
     } finally {
         if (automation && automation.browser) {

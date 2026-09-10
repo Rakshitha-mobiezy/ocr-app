@@ -466,14 +466,14 @@ app.post('/trigger-automation', (req, res) => {
     }
 
     // Extract parameters from request body
-    const { username, password, vcNumber } = req.body;
+    const {id, username, password, vcNumber } = req.body;
 
     // Validate required parameters
-    if (!username || !password || !vcNumber) {
+    if (!id || !username || !password || !vcNumber) {
         return res.status(400).json({
             status: 'error',
-            message: 'Missing required parameters. Please provide username, password, and vcNumber',
-            required: ['username', 'password', 'vcNumber']
+            message: 'Missing required parameters. Please provide id, username, password, and vcNumber',
+            required: ['id', 'username', 'password', 'vcNumber']
         });
     }
 
@@ -507,8 +507,7 @@ app.post('/trigger-automation', (req, res) => {
 
     // Prepare command with parameters
     const scriptPath = path.join(__dirname, 'run-with-args.js');
-    const command = `node "${scriptPath}" --username "${username}" --password "${password}" --vc "${vcNumber}"`;
-    
+    const command = `node "${scriptPath}" --id "${id}" --username "${username}" --password "${password}" --vc "${vcNumber}"`;    
     console.log(`🚀 Executing: ${command}`);
 
     // Execute the automation script in the background
