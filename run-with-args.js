@@ -505,7 +505,7 @@ function saveResult(resultData) {
 
 // Sends the final result to the external callback API.
 // PLACEHOLDER URL — replace this with the real callback endpoint once it's ready.
-const CALLBACK_API_URL = 'https://example.com/api/renewal-callback'; // <-- REPLACE THIS URL
+const CALLBACK_API_URL = 'https://apibng.mobiezy.in/service2/automation_trigger_update'; // <-- REPLACE THIS URL
 
 // async function sendCallback(id, status, response, preEndDate) {
 //     if (!id) {
